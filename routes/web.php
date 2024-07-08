@@ -17,6 +17,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/exercise/{id}', [ExerciseController::class, 'show'])->name('exercise.show');
+    Route::post('/exercise/{id}/done', [ExerciseController::class, 'markAsDone'])->name('exercise.markAsDone');
 });
 
 require __DIR__.'/auth.php';

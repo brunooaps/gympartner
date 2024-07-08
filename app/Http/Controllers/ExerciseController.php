@@ -66,4 +66,18 @@ class ExerciseController extends Controller
     {
         //
     }
+
+
+    /**
+     * Mark the exercise as done.
+     */
+    public function markAsDone($id)
+    {
+        $exercise = Exercise::findOrFail($id);
+        $exercise->done = true;
+        $exercise->done_at = today();
+        $exercise->save();
+
+        return redirect()->route('exercise.show', $id)->with('status', 'Exercise marked as done!');
+    }
 }

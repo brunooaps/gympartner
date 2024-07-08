@@ -19,5 +19,8 @@ class Exercise extends Model
         'user_id',
         'title',
         'description',
+        'done',
+        'done_at',
+        'do_again_every'
     ];
 }

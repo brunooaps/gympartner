@@ -17,7 +17,10 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('title');
             $table->text('description');
-            $table->string('height');
+            $table->string('height')->nullable();
+            $table->boolean('done')->nullable();
+            $table->timestamp('done_at')->nullable();
+            $table->string('do_again_every')->nullable();
             $table->timestamps();
 
             $table->foreign('trainer_id')->references('id')->on('users')->onDelete('cascade');
