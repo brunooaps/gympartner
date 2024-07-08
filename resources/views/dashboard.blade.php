@@ -9,7 +9,28 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{ __("You're logged in!") }}
+                    <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight mt-4">
+                        {{ __('Your Exercises') }}
+                    </h3>
+
+                    @if($exercises->isEmpty())
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">
+                            {{ __('You have no exercises.') }}
+                        </p>
+                    @else
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
+                            @foreach($exercises as $exercise)
+                                <a href="{{ route('exercise.show', $exercise->id) }}" class="block bg-white dark:bg-gray-700 rounded-lg shadow p-4 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <h4 class="font-semibold text-gray-800 dark:text-gray-200">
+                                        {{ $exercise->title }}
+                                    </h4>
+                                    <p class="text-gray-600 dark:text-gray-400 mt-2">
+                                        {{ \Illuminate\Support\Str::limit($exercise->description, 100) }}
+                                    </p>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

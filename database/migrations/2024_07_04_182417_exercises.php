@@ -17,12 +17,11 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('title');
             $table->text('description');
+            $table->string('height');
             $table->timestamps();
 
             $table->foreign('trainer_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-
-            $table->unique(['trainer_id', 'user_id']);
         });
     }
 
