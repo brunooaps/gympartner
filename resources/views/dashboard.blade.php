@@ -20,13 +20,21 @@
                     @else
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
                             @foreach($exercises as $exercise)
-                                <a href="{{ route('exercise.show', $exercise->id) }}" class="block bg-white dark:bg-gray-700 rounded-lg shadow p-4 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                    <h4 class="font-semibold text-gray-800 dark:text-gray-200">
+                                <a href="{{ route('exercise.show', $exercise->id) }}" class="block rounded-lg shadow p-4 hover:bg-gray-100 dark:hover:bg-gray-600 {{ $exercise->done ? 'bg-gray-200 dark:bg-gray-600' : 'bg-white dark:bg-gray-700' }}">
+                                    <h4 class="font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                                         {{ $exercise->title }}
+                                        @if($exercise->done)
+                                            <span class="ml-2 text-green-500">✔️</span>
+                                        @endif
                                     </h4>
                                     <p class="text-gray-600 dark:text-gray-400 mt-2">
                                         {{ \Illuminate\Support\Str::limit($exercise->description, 100) }}
                                     </p>
+                                    @if($exercise->next_due_date)
+                                        <p class="text-gray-600 dark:text-gray-400 mt-2">
+                                            {{ __('Next due date:') }} {{ $exercise->next_due_date }}
+                                        </p>
+                                    @endif
                                 </a>
                             @endforeach
                         </div>

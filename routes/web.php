@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/exercise/{id}', [ExerciseController::class, 'show'])->name('exercise.show');
     Route::post('/exercise/{id}/done', [ExerciseController::class, 'markAsDone'])->name('exercise.markAsDone');
+    Route::post('/exercise/{id}/add-description', [ExerciseController::class, 'addDescription'])->name('exercise.addDescription');
 });
 
 require __DIR__.'/auth.php';

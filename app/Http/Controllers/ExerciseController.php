@@ -80,4 +80,17 @@ class ExerciseController extends Controller
 
         return redirect()->route('exercise.show', $id)->with('status', 'Exercise marked as done!');
     }
+
+    public function addDescription(Request $request, $id)
+    {
+        $request->validate([
+            'client_description' => 'required|string|max:1000',
+        ]);
+
+        $exercise = Exercise::findOrFail($id);
+        $exercise->client_description = $request->client_description;
+        $exercise->save();
+
+        return redirect()->route('exercise.show', $id)->with('status', 'Description added successfully!');
+    }
 }

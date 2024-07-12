@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +16,14 @@ class HomeController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $exercises = $user->exercises; // Assumindo que você tem o relacionamento configurado
+        $exercises = $user->exercises;
+
+        foreach ($exercises as $exercise) {
+            if($exercise->done && isset($exercise->do_again_every)){
+                $doneAt = Carbon::parse($exercise->done_at);
+                $exercise->next_due_date = $doneAt->addDays($exercise->do_again_every)->format('d/m/Y');
+            }
+        }
         return view('dashboard', compact('exercises'));
     }
 
