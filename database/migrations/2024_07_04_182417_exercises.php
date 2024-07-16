@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('exercises', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('trainer_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('title');
             $table->text('description');
             $table->text('client_description')->nullable();
