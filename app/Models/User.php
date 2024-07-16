@@ -11,6 +11,9 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    const ACCESS_LEVEL_CLIENT = 1;
+    const ACCESS_LEVEL_TRAINER = 2;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -48,5 +51,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function isClient()
+    {
+        return $this->access_level === self::ACCESS_LEVEL_CLIENT;
+    }
+
+    public function isTrainer()
+    {
+        return $this->access_level === self::ACCESS_LEVEL_TRAINER;
     }
 }
