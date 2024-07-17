@@ -13,7 +13,7 @@ Route::get('/', function () {
 
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+    Route::get('/exercises', [HomeController::class, 'index'])->name('exercises');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -24,10 +24,14 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', CheckAccessLevel::class])->group(function () {
-    Route::get('/dashboard-trainer', [TrainerController::class, 'index'])->name('dashboard-trainer');
-    Route::post('/client', [TrainerController::class, 'create'])->name('client.create');
+    Route::get('/dashboard-trainer', [TrainerController::class, 'index'])->name('client.index');
+    Route::get('/clients', [TrainerController::class, 'create'])->name('client.create');
+    Route::get('/client/{id}', [TrainerController::class, 'show'])->name('client.show');
+    Route::post('/client', [TrainerController::class, 'store'])->name('client.store');
+    Route::post('/client/{id}', [TrainerController::class, 'edit'])->name('client.edit');
     Route::put('/client/{id}', [TrainerController::class, 'update'])->name('client.update');
-    Route::post('/exercise', [ExerciseController::class, 'create'])->name('exercise.create');
+    Route::delete('/client/{id}', [TrainerController::class, 'destroy'])->name('client.destroy');
+    Route::post('/exercise', [ExerciseController::class, 'store'])->name('exercise.store');
     Route::post('/exerciseAttribute', [ExerciseController::class, 'attribute'])->name('exercise.attribute');
     Route::put('/exercise/{id}', [ExerciseController::class, 'update'])->name('exercise.update');
 });

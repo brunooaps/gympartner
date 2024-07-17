@@ -18,7 +18,7 @@
                 </div>
             </div>
 
-            @if(!$exercise->done)
+            @if(!$review->done)
                 <form method="POST" action="{{ route('exercise.markAsDone', $exercise->id) }}" class="mb-4">
                     @csrf
                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">

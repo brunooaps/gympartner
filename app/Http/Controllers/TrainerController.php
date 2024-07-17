@@ -8,6 +8,7 @@ use App\Models\TrainerHasUser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class TrainerController extends Controller
 {
@@ -18,9 +19,9 @@ class TrainerController extends Controller
     {
         $trainerId = Auth::user()->id;
         $userIds = TrainerHasUser::where('trainer_id', $trainerId)->pluck('user_id');
-    
+
         $clients = User::whereIn('id', $userIds)->get();
-    
+
         return view('dashboard-trainer', compact('clients'));
     }
 
@@ -29,7 +30,7 @@ class TrainerController extends Controller
      */
     public function create()
     {
-        //
+        return view('clients.create');
     }
 
     /**
@@ -37,15 +38,33 @@ class TrainerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+        ]);
+
+        $client = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'access_level' => 'client',
+            'password' => Hash::make($request->email),
+        ]);
+
+        TrainerHasUser::create([
+            'trainer_id' => Auth::user()->id,
+            'user_id' => $client->id
+        ]);
+
+        return redirect()->route('client.index')->with('success', 'Client created successfully');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show($id)
     {
-        //
+        $client = User::findOrFail($id);
+        return view('clients.show', compact('client'));
     }
 
     /**

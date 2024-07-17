@@ -6,6 +6,7 @@ use App\Models\Exercise;
 use App\Models\Payment;
 use App\Models\TrainerHasUser;
 use App\Models\User;
+use App\Models\UserHasExercise;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -30,6 +31,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Exercise::factory()->count(10)->create();
+
+        UserHasExercise::factory()->count(10)->create();
         
         Payment::factory()->count(2)->create();
 

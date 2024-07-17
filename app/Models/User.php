@@ -40,6 +40,11 @@ class User extends Authenticatable
         return $this->hasMany(Exercise::class, 'user_id');
     }
 
+    public function trainerExercises()
+    {
+        return $this->hasMany(Exercise::class, 'trainer_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

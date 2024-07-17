@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
+            {{ __('Exercises') }}
         </h2>
     </x-slot>
 
@@ -23,14 +23,14 @@
                                 <a href="{{ route('exercise.show', $exercise->id) }}" class="block rounded-lg shadow p-4 hover:bg-gray-100 bg-gray-500">
                                     <h4 class="font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                                         {{ $exercise->title }}
-                                        @if($exercise->done)
+                                        @if($exercise->done && !Auth::user()->access_level == 'trainer')
                                             <span class="ml-2 text-green-500">✔️</span>
                                         @endif
                                     </h4>
                                     <p class="text-gray-600 dark:text-gray-400 mt-2">
                                         {{ \Illuminate\Support\Str::limit($exercise->description, 100) }}
                                     </p>
-                                    @if($exercise->next_due_date)
+                                    @if($exercise->next_due_date && !Auth::user()->access_level == 'trainer')
                                         <p class="text-gray-600 dark:text-gray-400 mt-2">
                                             {{ __('Next due date:') }} {{ $exercise->next_due_date }}
                                         </p>

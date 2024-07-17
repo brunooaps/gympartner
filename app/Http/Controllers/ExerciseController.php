@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Exercise;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\UserHasExercise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -39,9 +41,23 @@ class ExerciseController extends Controller
     public function show($id)
     {
         $userId = Auth::user()->id;
-        $exercise = Exercise::where('user_id', '=', $userId)->findOrFail($id);
-        return view('exercises.show', compact('exercise'));
+        
+        // Tentar encontrar o exercício pelo user_id
+        $exercise = Exercise::where('user_id', $userId)->where('id', $id)->first();
+        
+        // Se não encontrar, tentar encontrar pelo trainer_id
+        if (!$exercise) {
+            $exercise = Exercise::where('trainer_id', $userId)->where('id', $id)->firstOrFail();
+            $clients = User::where('id', '=', $exercise->user_id)->get();
+            $review = UserHasExercise::where('exercise_id', '=', $exercise->id)->get();
+            return view('exercises.show-trainer', compact(['exercise', 'clients', 'review']));
+        }
+    
+        $review = UserHasExercise::where('exercise_id', '=', $exercise->id)->get();
+
+        return view('exercises.show', compact(['exercise', 'review']));
     }
+    
 
     /**
      * Show the form for editing the specified resource.
