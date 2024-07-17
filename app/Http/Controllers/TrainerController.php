@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Models\TrainerHasUser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,16 +16,12 @@ class TrainerController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        $exercises = $user->exercises;
-
-        foreach ($exercises as $exercise) {
-            if($exercise->done && isset($exercise->do_again_every)){
-                $doneAt = Carbon::parse($exercise->done_at);
-                $exercise->next_due_date = $doneAt->addDays($exercise->do_again_every)->format('d/m/Y');
-            }
-        }
-        return view('dashboard', compact('exercises'));
+        $trainerId = Auth::user()->id;
+        $userIds = TrainerHasUser::where('trainer_id', $trainerId)->pluck('user_id');
+    
+        $clients = User::whereIn('id', $userIds)->get();
+    
+        return view('dashboard-trainer', compact('clients'));
     }
 
     /**
