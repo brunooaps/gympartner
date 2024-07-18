@@ -48,17 +48,31 @@ class ExerciseController extends Controller
         // Se não encontrar, tentar encontrar pelo trainer_id
         if (!$exercise) {
             $exercise = Exercise::where('trainer_id', $userId)->where('id', $id)->firstOrFail();
-            $clients = User::where('id', '=', $exercise->user_id)->get();
-            $review = UserHasExercise::where('exercise_id', '=', $exercise->id)->get();
-            return view('exercises.show-trainer', compact(['exercise', 'clients', 'review']));
+            $reviews = UserHasExercise::where('user_id', '=', $exercise->user_id)->get();
+            $clients = [];
+            if ($reviews->isNotEmpty()) {
+                foreach ($reviews as $review) {
+                    $clients[] = User::where('id', '=', $review->user_id)->first();
+                }
+            }
+            if (isset($clients[0])) {
+                return view('exercises.show-trainer', compact(['exercise', 'clients', 'reviews']));
+            } else {
+                return view('exercises.show-trainer', compact(['exercise']));
+
+            }
         }
     
         $review = UserHasExercise::where('exercise_id', '=', $exercise->id)->get();
+        
+        if (isset($review[0])) {
+            return view('exercises.show-trainer', compact(['exercise', 'reviews']));
+        } else {
+            return view('exercises.show-trainer', compact(['exercise']));
 
-        return view('exercises.show', compact(['exercise', 'review']));
+        }    
     }
     
-
     /**
      * Show the form for editing the specified resource.
      */

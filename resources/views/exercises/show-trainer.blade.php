@@ -20,7 +20,7 @@
 
             @if (!$exercise->done)
                 <p class="text-green-500 mb-4">
-                    {{ __('This exercise has not been done!') }} <span class="ml-2 text-green-500">✔️</span>
+                    {{ __('This exercise has not been done!') }}
                 </p>
             @else
                 <p class="text-green-500 mb-4">
@@ -28,35 +28,18 @@
                 </p>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200">
-                        {{ __('Review of training') }}
-                    </h4>
-                    @if ($review && $review->review)
-                        <p class="mt-2 p-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                            {{ $review->review }}
-                        </p>
-                    @else
-                        <p class="mt-2 text-gray-600 dark:text-gray-400">
-                            {{ __('No review available.') }}
-                        </p>
-                    @endif
-                </div>
-            </div>
-
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-4">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200">
                         {{ __('Clients with this exercise') }}
                     </h4>
-                    @if ($clients->isEmpty())
+                    @if (!isset($clients))
                         <p class="mt-2 text-gray-600 dark:text-gray-400">
                             {{ __('No clients are assigned to this exercise.') }}
                         </p>
                     @else
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
-                            @foreach ($clients as $client)
+                            @foreach ($clients as $key => $client)
                                 <a href="{{ route('client.show', $client->id) }}"
                                     class="block rounded-lg shadow p-4 hover:bg-gray-100 bg-gray-500">
                                     <h4 class="font-semibold text-gray-800 dark:text-gray-200">
@@ -69,6 +52,22 @@
                                         {{ __('Joined at:') }} {{ $client->created_at->format('d/m/Y') }}
                                     </p>
                                 </a>
+                                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                                    <div class="p-6 text-gray-900 dark:text-gray-100">
+                                        <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200">
+                                            {{ __('Review of training') }}
+                                        </h4>
+                                        @if ($reviews->isNotEmpty() && $reviews[$key]->review)
+                                            <p class="mt-2 p-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                                {{ $reviews[$key]->review }}
+                                            </p>
+                                        @else
+                                            <p class="mt-2 text-gray-600 dark:text-gray-400">
+                                                {{ __('No review available.') }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
                             @endforeach
                         </div>
                     @endif
