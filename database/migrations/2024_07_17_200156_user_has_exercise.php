@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('exercise_id');
             $table->unsignedBigInteger('user_id');
-            $table->text('review');
+            $table->text('review')->nullable();
             $table->boolean('done')->nullable();
             $table->timestamp('done_at')->nullable();
             $table->integer('do_again_every')->nullable();
