@@ -43,34 +43,33 @@ class ExerciseController extends Controller
         $userId = Auth::user()->id;
         
         // Tentar encontrar o exercício pelo user_id
-        $exercise = Exercise::where('user_id', $userId)->where('id', $id)->first();
-        
-        // Se não encontrar, tentar encontrar pelo trainer_id
-        if (!$exercise) {
-            $exercise = Exercise::where('trainer_id', $userId)->where('id', $id)->firstOrFail();
-            $reviews = UserHasExercise::where('user_id', '=', $exercise->user_id)->get();
-            $clients = [];
-            if ($reviews->isNotEmpty()) {
-                foreach ($reviews as $review) {
-                    $clients[] = User::where('id', '=', $review->user_id)->first();
-                }
-            }
-            if (isset($clients[0])) {
-                return view('exercises.show-trainer', compact(['exercise', 'clients', 'reviews']));
-            } else {
-                return view('exercises.show-trainer', compact(['exercise']));
+        $exercise = Exercise::where('id', $id)->first();
+        $review = UserHasExercise::where('exercise_id', '=', $id)->where('user_id', '=', $userId)->first();
 
-            }
-        }
+        $exerciseDetails = [
+            'exercise' => $exercise,
+            'review' => $review
+        ];
+        
+        // // Se não encontrar, tentar encontrar pelo trainer_id
+        // if (!$exercise) {
+        //     $exercise = Exercise::where('trainer_id', $userId)->where('id', $id)->firstOrFail();
+        //     $reviews = UserHasExercise::where('user_id', '=', $exercise->user_id)->get();
+        //     $clients = [];
+        //     if ($reviews->isNotEmpty()) {
+        //         foreach ($reviews as $review) {
+        //             $clients[] = User::where('id', '=', $review->user_id)->first();
+        //         }
+        //     }
+        //     if (isset($clients[0])) {
+        //         return view('exercises.show-trainer', compact(['exercise', 'clients', 'reviews']));
+        //     } else {
+        //         return view('exercises.show-trainer', compact(['exercise']));
+
+        //     }
+        // }
     
-        $review = UserHasExercise::where('exercise_id', '=', $exercise->id)->get();
-        
-        if (isset($review[0])) {
-            return view('exercises.show-trainer', compact(['exercise', 'reviews']));
-        } else {
-            return view('exercises.show-trainer', compact(['exercise']));
-
-        }    
+        return view('exercises.show', compact(['exerciseDetails']));
     }
     
     /**
@@ -103,7 +102,8 @@ class ExerciseController extends Controller
      */
     public function markAsDone($id)
     {
-        $exercise = Exercise::findOrFail($id);
+        $userId = Auth::user()->id;
+        $exercise = UserHasExercise::where('exercise_id', '=', $id)->where('user_id', '=', $userId)->first();
         $exercise->done = true;
         $exercise->done_at = today();
         $exercise->save();
@@ -117,8 +117,9 @@ class ExerciseController extends Controller
             'client_description' => 'required|string|max:1000',
         ]);
 
-        $exercise = Exercise::findOrFail($id);
-        $exercise->client_description = $request->client_description;
+        $userId = Auth::user()->id;
+        $exercise = UserHasExercise::where('exercise_id', '=', $id)->where('user_id', '=', $userId)->first();
+        $exercise->review = $request->client_description;
         $exercise->save();
 
         return redirect()->route('exercise.show', $id)->with('status', 'Description added successfully!');

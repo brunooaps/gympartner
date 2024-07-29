@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/exercise/{id}', [ExerciseController::class, 'show'])->name('exercise.show');
-    Route::put('/exercise/{id}/done', [ExerciseController::class, 'markAsDone'])->name('exercise.markAsDone');
+    Route::post('/exercise/{id}/done', [ExerciseController::class, 'markAsDone'])->name('exercise.markAsDone');
     Route::post('/exercise/{id}/add-description', [ExerciseController::class, 'addDescription'])->name('exercise.addDescription');
 });
 
@@ -27,6 +27,7 @@ Route::middleware(['auth', CheckAccessLevel::class])->group(function () {
     Route::get('/dashboard-trainer', [TrainerController::class, 'index'])->name('client.index');
     Route::get('/clients', [TrainerController::class, 'create'])->name('client.create');
     Route::get('/client/{id}', [TrainerController::class, 'show'])->name('client.show');
+    Route::get('/exercise-trainer/{id}', [TrainerController::class, 'showTrainer'])->name('exercise.show-trainer');
     Route::post('/client', [TrainerController::class, 'store'])->name('client.store');
     Route::post('/client/{id}', [TrainerController::class, 'edit'])->name('client.edit');
     Route::put('/client/{id}', [TrainerController::class, 'update'])->name('client.update');

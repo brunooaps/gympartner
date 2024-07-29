@@ -10,36 +10,26 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-4">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h3 class="font-semibold text-2xl text-gray-800 dark:text-gray-200">
-                        {{ $exercise->title }}
+                        {{ $data['exercise']->title }}
                     </h3>
                     <p class="mt-4 text-gray-600 dark:text-gray-400">
-                        {!! nl2br(e($exercise->description)) !!}
+                        {!! nl2br(e($data['exercise']->description)) !!}
                     </p>
                 </div>
             </div>
-
-            @if (!$exercise->done)
-                <p class="text-green-500 mb-4">
-                    {{ __('This exercise has not been done!') }}
-                </p>
-            @else
-                <p class="text-green-500 mb-4">
-                    {{ __('This exercise is done!') }} <span class="ml-2 text-green-500">✔️</span>
-                </p>
-            @endif
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-4">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200">
                         {{ __('Clients with this exercise') }}
                     </h4>
-                    @if (!isset($clients))
+                    @if (empty($data['clients']))
                         <p class="mt-2 text-gray-600 dark:text-gray-400">
                             {{ __('No clients are assigned to this exercise.') }}
                         </p>
                     @else
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
-                            @foreach ($clients as $key => $client)
+                            @foreach ($data['clients'] as $key => $client)
                                 <a href="{{ route('client.show', $client->id) }}"
                                     class="block rounded-lg shadow p-4 hover:bg-gray-100 bg-gray-500">
                                     <h4 class="font-semibold text-gray-800 dark:text-gray-200">
@@ -52,14 +42,25 @@
                                         {{ __('Joined at:') }} {{ $client->created_at->format('d/m/Y') }}
                                     </p>
                                 </a>
-                                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mt-4">
                                     <div class="p-6 text-gray-900 dark:text-gray-100">
+                                        @if (!$data['reviews'][$key]->done)
+                                            <p class="text-green-500 mb-4">
+                                                {{ __('This exercise has not been done!') }}
+                                            </p>
+                                        @else
+                                            <p class="text-green-500 mb-4">
+                                                {{ __('This exercise is done!') }} <span
+                                                    class="ml-2 text-green-500">✔️</span>
+                                            </p>
+                                        @endif
                                         <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200">
                                             {{ __('Review of training') }}
                                         </h4>
-                                        @if ($reviews->isNotEmpty() && $reviews[$key]->review)
-                                            <p class="mt-2 p-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                                {{ $reviews[$key]->review }}
+                                        @if (isset($data['reviews'][$key]) && $data['reviews'][$key]->review)
+                                            <p
+                                                class="mt-2 p-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                                {{ $data['reviews'][$key]->review }}
                                             </p>
                                         @else
                                             <p class="mt-2 text-gray-600 dark:text-gray-400">

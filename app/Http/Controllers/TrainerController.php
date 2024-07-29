@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Models\Exercise;
 use App\Models\TrainerHasUser;
+use App\Models\UserHasExercise;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,7 +66,40 @@ class TrainerController extends Controller
     public function show($id)
     {
         $client = User::findOrFail($id);
-        return view('clients.show', compact('client'));
+        $Userexercises = UserHasExercise::where('user_id', '=', $id)->get();
+
+        foreach ($Userexercises as $exercise) {
+            $exercises[] = Exercise::findOrFail($exercise->exercise_id);
+            $reviews[] = UserHasExercise::where('exercise_id', '=', $exercise->exercise_id)->where('user_id', '=', $id)->first();
+        }
+
+        $data = [
+            'client' => $client,
+            'exercises' => $exercises,
+            'reviews' => $reviews
+        ];
+        return view('clients.show', compact(['data']));
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function showTrainer($id)
+    {
+        $exercise = Exercise::findOrFail($id);
+        $usersExercise = UserHasExercise::where('exercise_id', '=', $id)->get();
+        foreach ($usersExercise as $key => $value) {
+            $clients[] = User::findOrFail($value->user_id);
+            $reviews[] = UserHasExercise::where('user_id', '=', $clients[$key]->id)->first();
+        }
+
+        $data = [
+            'clients' => $clients,
+            'exercise' => $exercise,
+            'reviews' => $reviews
+        ];
+
+        return view('exercises.show-trainer', compact(['data']));
     }
 
     /**
