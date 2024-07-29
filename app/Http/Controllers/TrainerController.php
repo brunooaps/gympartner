@@ -67,16 +67,17 @@ class TrainerController extends Controller
     {
         $client = User::findOrFail($id);
         $Userexercises = UserHasExercise::where('user_id', '=', $id)->get();
-
-        foreach ($Userexercises as $exercise) {
-            $exercises[] = Exercise::findOrFail($exercise->exercise_id);
-            $reviews[] = UserHasExercise::where('exercise_id', '=', $exercise->exercise_id)->where('user_id', '=', $id)->first();
+        if (!$Userexercises->isEmpty()) {
+            foreach ($Userexercises as $exercise) {
+                $exercises[] = Exercise::findOrFail($exercise->exercise_id);
+                $reviews[] = UserHasExercise::where('exercise_id', '=', $exercise->exercise_id)->where('user_id', '=', $id)->first();
+            }
         }
 
         $data = [
             'client' => $client,
-            'exercises' => $exercises,
-            'reviews' => $reviews
+            'exercises' => $exercises ?? null,
+            'reviews' => $reviews ?? null
         ];
         return view('clients.show', compact(['data']));
     }
@@ -88,18 +89,32 @@ class TrainerController extends Controller
     {
         $exercise = Exercise::findOrFail($id);
         $usersExercise = UserHasExercise::where('exercise_id', '=', $id)->get();
-        foreach ($usersExercise as $key => $value) {
-            $clients[] = User::findOrFail($value->user_id);
-            $reviews[] = UserHasExercise::where('user_id', '=', $clients[$key]->id)->first();
+        if (!$usersExercise->isEmpty()) {
+            foreach ($usersExercise as $key => $value) {
+                $clients[] = User::findOrFail($value->user_id);
+                $reviews[] = UserHasExercise::where('user_id', '=', $clients[$key]->id)->first();
+            }
         }
 
         $data = [
-            'clients' => $clients,
+            'clients' => $clients ?? null,
             'exercise' => $exercise,
-            'reviews' => $reviews
+            'reviews' => $reviews ?? null
         ];
 
         return view('exercises.show-trainer', compact(['data']));
+    }
+
+    /**
+     * Assign an exercise to a user
+     */
+    public function assign($id)
+    {
+        $trainerId = Auth::user()->id;
+        $user = User::find($id);
+        $exercises = Exercise::where('trainer_id', '=', $trainerId)->get();
+
+        return view('exercises.assign', compact(['user', 'exercises']));
     }
 
     /**

@@ -13,6 +13,12 @@
                         {{ __('Your Exercises') }}
                     </h3>
 
+                    @if(Auth::user()->access_level == 'trainer')
+                        <a href="{{ route('exercise.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                            {{ __('Create Exercise') }}
+                        </a>
+                    @endif
+
                     @if($exercises->isEmpty())
                         <p class="mt-2 text-gray-600 dark:text-gray-400">
                             {{ __('You have no exercises.') }}

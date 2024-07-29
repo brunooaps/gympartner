@@ -24,16 +24,65 @@ class ExerciseController extends Controller
      */
     public function create()
     {
-        //
+        return view('exercises.create');
+    }
+
+    /**
+     * Store a newly created exercise in storage.
+     */
+    public function store(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'trainer_id' => 'required|exists:users,id',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
+        // Create a new exercise
+        $exercise = new Exercise();
+        $exercise->trainer_id = $request->trainer_id;
+        $exercise->title = $request->title;
+        $exercise->description = $request->description;
+
+        // Save the exercise to the database
+        $exercise->save();
+
+        // Redirect to the exercises list or another appropriate page
+        return redirect()->route('exercises')->with('success', 'Exercise created successfully.');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function assign($id)
     {
-        //
+        $trainerId = Auth::user()->id;
+        $user = User::findOrFail($id);
+        $exercises = Exercise::where('trainer_id', '=', $trainerId)->get();
+
+        return view('exercises.assign', compact(['user', 'exercises']));
     }
+
+    /**
+     * Assign selected exercises to a user
+     */
+    public function assignToUser(Request $request, $userId)
+    {
+        $user = User::findOrFail($userId);
+        $exerciseIds = $request->input('exercises', []);
+
+        foreach ($exerciseIds as $exerciseId) {
+            UserHasExercise::create([
+                'user_id' => $user->id,
+                'exercise_id' => $exerciseId,
+                'done' => false,
+            ]);
+        }
+
+        return redirect()->route('client.show', $user->id)->with('success', 'Exercises assigned successfully.');
+    }
+
 
     /**
      * Display the specified resource.
@@ -41,37 +90,19 @@ class ExerciseController extends Controller
     public function show($id)
     {
         $userId = Auth::user()->id;
-        
+
         // Tentar encontrar o exercício pelo user_id
-        $exercise = Exercise::where('id', $id)->first();
+        $exercise = Exercise::find($id);
         $review = UserHasExercise::where('exercise_id', '=', $id)->where('user_id', '=', $userId)->first();
 
         $exerciseDetails = [
             'exercise' => $exercise,
             'review' => $review
         ];
-        
-        // // Se não encontrar, tentar encontrar pelo trainer_id
-        // if (!$exercise) {
-        //     $exercise = Exercise::where('trainer_id', $userId)->where('id', $id)->firstOrFail();
-        //     $reviews = UserHasExercise::where('user_id', '=', $exercise->user_id)->get();
-        //     $clients = [];
-        //     if ($reviews->isNotEmpty()) {
-        //         foreach ($reviews as $review) {
-        //             $clients[] = User::where('id', '=', $review->user_id)->first();
-        //         }
-        //     }
-        //     if (isset($clients[0])) {
-        //         return view('exercises.show-trainer', compact(['exercise', 'clients', 'reviews']));
-        //     } else {
-        //         return view('exercises.show-trainer', compact(['exercise']));
 
-        //     }
-        // }
-    
         return view('exercises.show', compact(['exerciseDetails']));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      */
