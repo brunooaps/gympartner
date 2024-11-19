@@ -26,9 +26,10 @@ class HomeController extends Controller
         foreach ($exercises as $exercise) {
             $userExercises = UserHasExercise::where('exercise_id', '=', $exercise->id)->get();
             foreach ($userExercises as $userExercise) {
-                if($userExercise->done && isset($userExercise->do_again_every)){
+                if ($userExercise->done && isset($userExercise->do_again_every)) {
                     $doneAt = Carbon::parse($userExercise->done_at);
-                    $exercise->next_due_date = $doneAt->addDays($exercise->do_again_every)->format('d/m/Y');
+                    $nextDueDate = $doneAt->copy()->addDays($userExercise->do_again_every);
+                    $exercise->next_due_date = $nextDueDate->format('d/m/Y');
                 }
             }
         }
