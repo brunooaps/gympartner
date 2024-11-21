@@ -1,59 +1,45 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Client Details') }}
-        </h2>
+        <div style="background-color: #e8e2dd; padding: 16px; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <h1 class="text-4xl font-bold text-center" style="color: #312c27; font-family: 'Hammersmith One', sans-serif; margin: 0;">
+                {{ __('Client Details') }}
+            </h1>
+        </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12" style="background-color: #e8e2dd;">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight mt-4">
+            <div style="background-color: #fff; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); padding: 16px;">
+                <div style="text-align: center; color: #312c27;">
+                    <h3 style="font-size: 1.5rem; font-family: 'Hammersmith One', sans-serif; margin-top: 12px;">
                         {{ $data['client']->name }}
                     </h3>
 
-                    <div class="mt-4">
-                        <p class="text-gray-600 dark:text-gray-400">
+                    <div style="margin-top: 16px;">
+                        <p style="font-family: 'Clear Sans', sans-serif; font-size: 1rem; color: #312c27;">
                             <strong>{{ __('Email:') }}</strong> {{ $data['client']->email }}
                         </p>
-                        <p class="text-gray-600 dark:text-gray-400 mt-2">
+                        <p style="font-family: 'Clear Sans', sans-serif; font-size: 1rem; color: #312c27; margin-top: 8px;">
                             <strong>{{ __('Joined at:') }}</strong>
                             {{ \Carbon\Carbon::parse($data['client']->created_at)->format('d/m/Y') }}
                         </p>
                     </div>
 
-                    <div class="mt-6">
-                        <a href="{{ route('client.edit', $data['client']->id) }}"
-                            class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
-                            {{ __('Edit Client') }}
-                        </a>
-                        <form action="{{ route('client.destroy', $data['client']->id) }}" method="POST"
-                            class="inline-block">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                {{ __('Delete Client') }}
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="mt-8">
-                        <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">
+                    <div style="margin-top: 40px;">
+                        <h4 style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center;">
                             {{ __('Exercises') }}
                         </h4>
-                        <ul class="mt-4">
+                        <ul style="margin-top: 20px; padding-left: 0;">
                             @if (!empty($data['exercises']))
                                 @foreach ($data['exercises'] as $index => $exercise)
-                                    <li class="mb-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-md shadow-sm">
-                                        <h5 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+                                    <li style="margin-bottom: 20px; padding: 16px; background-color: #feb924; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                                        <h5 style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center;">
                                             {{ $exercise->title }}
                                         </h5>
-                                        <p class="mt-2 text-gray-600 dark:text-gray-400">
+                                        <p style="margin-top: 12px; font-family: 'Clear Sans', sans-serif; color: #312c27;">
                                             {!! nl2br(e($exercise->description)) !!}
                                         </p>
-                                        <p class="mt-2 text-gray-600 dark:text-gray-400">
+                                        <p style="margin-top: 8px; font-family: 'Clear Sans', sans-serif; color: #312c27;">
                                             <strong>{{ __('Created at:') }}</strong>
                                             {{ \Carbon\Carbon::parse($exercise->created_at)->format('d/m/Y') }}
                                         </p>
@@ -61,25 +47,44 @@
                                             $review = $data['reviews'][$index] ?? null;
                                         @endphp
                                         @if ($review && $review->done)
-                                            <p class="mt-2 text-green-500">
+                                            <p style="margin-top: 8px; font-family: 'Clear Sans', sans-serif; color: #38a169;">
                                                 {{ __('Completed at:') }}
                                                 {{ \Carbon\Carbon::parse($review->done_at)->format('d/m/Y') }}
                                             </p>
                                         @else
-                                            <p class="mt-2 text-red-500">
+                                            <p style="margin-top: 8px; font-family: 'Clear Sans', sans-serif; color: #e53e3e;">
                                                 {{ __('Not completed yet') }}
                                             </p>
                                         @endif
                                     </li>
                                 @endforeach
                             @else
-                                <p>{{ __('This user has no exercises') }}</p>
-                                <a href="{{ route('exercise.assign', $data['client']->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                                <p style="font-family: 'Clear Sans', sans-serif; color: #312c27;">
+                                    {{ __('This user has no exercises') }}
+                                </p>
+                                <a href="{{ route('exercise.assign', $data['client']->id) }}"
+                                    style="background-color: #3b82f6; color: white; font-family: 'Clear Sans', sans-serif; font-weight: bold; padding: 12px 20px; border-radius: 8px; text-decoration: none; margin-top: 12px; display: inline-block;">
                                     {{ __('Assign Exercise') }}
                                 </a>
                             @endif
                         </ul>
                     </div>
+                </div>
+
+                <!-- Botões Editar e Deletar posicionados no final -->
+                <div style="margin-top: 40px; text-align: center;">
+                    <a href="{{ route('client.edit', $data['client']->id) }}"
+                        style="background-color: #feb924; color: white; font-family: 'Clear Sans', sans-serif; font-weight: bold; padding: 12px 16px; border-radius: 8px; text-decoration: none; margin-right: 8px;">
+                        {{ __('Edit Client') }}
+                    </a>
+                    <form action="{{ route('client.destroy', $data['client']->id) }}" method="POST" style="display: inline-block;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            style="background-color: #f87171; color: white; font-family: 'Clear Sans', sans-serif; font-weight: bold; padding: 12px 16px; border-radius: 8px; border: none; cursor: pointer;">
+                            {{ __('Delete Client') }}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
