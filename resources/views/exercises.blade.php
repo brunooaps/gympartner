@@ -12,7 +12,7 @@
                 </a>
             @endif
 
-            @if($exercises->isEmpty())
+            @if(!isset($exercises))
                 <p class="mt-6 font-clear-sans text-lg text-312c27">
                     {{ __('You have no exercises.') }}
                 </p>

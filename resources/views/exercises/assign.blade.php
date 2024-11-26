@@ -1,58 +1,92 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Assign Exercise to : ' . $user->name) }}
+        <h2 class="font-semibold text-xl leading-tight text-center">
+            {{ __('Assign Exercise to User') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight mt-4">
-                        {{ __('User Details') }}
+    <div class="flex justify-center mt-8">
+        <div class="w-full max-w-4xl px-4">
+            <div class="card shadow-lg rounded-lg bg-white">
+                <div class="card-header bg-blue-500 text-white p-4 rounded-t-lg">
+                    <h3 class="text-lg font-bold text-center">
+                        {{ __('Assign Exercise to a User') }}
                     </h3>
-                    
-                    <div class="mt-4">
-                        <p class="text-gray-600 dark:text-gray-400">
-                            <strong>{{ __('Name:') }}</strong> {{ $user->name }}
-                        </p>
-                        <p class="text-gray-600 dark:text-gray-400 mt-2">
-                            <strong>{{ __('Email:') }}</strong> {{ $user->email }}
-                        </p>
-                        <p class="text-gray-600 dark:text-gray-400 mt-2">
-                            <strong>{{ __('Joined at:') }}</strong> {{ \Carbon\Carbon::parse($user->created_at)->format('d/m/Y') }}
-                        </p>
-                    </div>
+                </div>
+                <div class="card-body p-6 space-y-6">
+                    <form action="{{ route('exercise.assignToUser') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="exercise_id" value="{{ $exercises->first()->id }}">
 
-                    <div class="mt-8">
-                        <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">
-                            {{ __('Available Exercises') }}
-                        </h4>
-                        <form action="{{ route('exercise.assignToUser', $user->id) }}" method="POST" class="mt-4">
-                            @csrf
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                                @foreach ($exercises as $exercise)
-                                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-md shadow-sm">
-                                        <input type="checkbox" id="exercise_{{ $exercise->id }}" name="exercises[]"
-                                            value="{{ $exercise->id }}" class="mr-2">
-                                        <label for="exercise_{{ $exercise->id }}" class="text-gray-800 dark:text-gray-200">
-                                            {{ $exercise->title }}
-                                        </label>
-                                        <p class="mt-2 text-gray-600 dark:text-gray-400">
-                                            {!! nl2br(e($exercise->description)) !!}
-                                        </p>
-                                    </div>
-                                @endforeach
+                        <!-- Detalhes do Exercício -->
+                        <div class="card mb-6 border border-gray-200 shadow-sm rounded-lg">
+                            <div class="card-header bg-gray-100 p-4 rounded-t-lg">
+                                <h4 class="font-semibold text-gray-700">{{ __('Exercise Details') }}</h4>
                             </div>
-                            <div class="mt-6">
+                            <div class="card-body p-4 space-y-4">
+                                <!-- Título do Exercício -->
+                                <div>
+                                    <label for="title"
+                                        class="block font-medium text-gray-600">{{ __('Title') }}</label>
+                                    <input type="text" id="title" name="title"
+                                        value="{{ $exercises->first()->title }}"
+                                        class="input w-full border rounded-lg p-2 text-gray-700 bg-gray-50" readonly>
+                                </div>
+
+                                <!-- Descrição do Exercício -->
+                                <div>
+                                    <label for="description"
+                                        class="block font-medium text-gray-600">{{ __('Description') }}</label>
+                                    <textarea id="description" name="description" rows="5"
+                                        class="input w-full border rounded-lg p-2 text-gray-700 bg-gray-50">{{ $exercises->first()->description }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seleção de Usuário -->
+                        <div class="card mb-6 border border-gray-200 shadow-sm rounded-lg">
+                            <div class="card-header bg-gray-100 p-4 rounded-t-lg">
+                                <h4 class="font-semibold text-gray-700">{{ __('Select User') }}</h4>
+                            </div>
+                            <div class="card-body p-4">
+                                <label for="user_id"
+                                    class="block font-medium text-gray-600">{{ __('User') }}</label>
+                                <select id="user_id" name="user_id"
+                                    class="input w-full border rounded-lg p-2 text-gray-700 bg-gray-50">
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Data de Vencimento -->
+                        <div class="card mb-6 border border-gray-200 shadow-sm rounded-lg">
+                            <div class="card-header bg-gray-100 p-4 rounded-t-lg">
+                                <h4 class="font-semibold text-gray-700">{{ __('Expiration Date') }}</h4>
+                            </div>
+                            <div class="card-body p-4">
+                                <label for="expiration_date"
+                                    class="block font-medium text-gray-600">{{ __('Expiration Date') }}</label>
+                                <input type="date" id="expiration_date" name="expiration_date"
+                                    class="input w-full border rounded-lg p-2 text-gray-700 bg-gray-50" required>
+                            </div>
+                        </div>
+
+                        <!-- Botão de Salvar -->
+                        <div class="card border border-gray-200 shadow-sm rounded-lg">
+                            <div class="card-body p-4 text-center">
                                 <button type="submit"
-                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                    {{ __('Assign Selected Exercises') }}
+                                    class="w-auto text-white rounded-md px-6 py-2 text-sm font-semibold"
+                                    style="background-color: #312c27; font-family: 'Hammersmith One', sans-serif; transition: background-color 0.3s; border: none; cursor: pointer;"
+                                    onmouseover="this.style.backgroundColor='#feb924';"
+                                    onmouseout="this.style.backgroundColor='#312c27';">
+                                    {{ __('Assign Exercise') }}
                                 </button>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

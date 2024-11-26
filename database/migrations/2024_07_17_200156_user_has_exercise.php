@@ -17,8 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->text('review')->nullable();
             $table->boolean('done')->nullable();
-            $table->timestamp('done_at')->nullable();
-            $table->integer('do_again_every')->nullable();
+            $table->timestamp('expiration_date')->nullable();
             $table->timestamps();
 
             $table->foreign('exercise_id')->references('id')->on('exercises')->onDelete('cascade');

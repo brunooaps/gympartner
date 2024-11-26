@@ -29,52 +29,69 @@
                         <h4 style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center;">
                             {{ __('Exercises') }}
                         </h4>
-                        <ul style="margin-top: 20px; padding-left: 0;">
-                            @if (!empty($data['exercises']))
-                                @foreach ($data['exercises'] as $index => $exercise)
-                                    <li style="margin-bottom: 20px; padding: 16px; background-color: #feb924; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-                                        <h5 style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center;">
-                                            {{ $exercise->title }}
-                                        </h5>
-                                        <p style="margin-top: 12px; font-family: 'Clear Sans', sans-serif; color: #312c27;">
-                                            {!! nl2br(e($exercise->description)) !!}
-                                        </p>
-                                        <p style="margin-top: 8px; font-family: 'Clear Sans', sans-serif; color: #312c27;">
-                                            <strong>{{ __('Created at:') }}</strong>
-                                            {{ \Carbon\Carbon::parse($exercise->created_at)->format('d/m/Y') }}
-                                        </p>
-                                        @php
-                                            $review = $data['reviews'][$index] ?? null;
-                                        @endphp
-                                        @if ($review && $review->done)
-                                            <p style="margin-top: 8px; font-family: 'Clear Sans', sans-serif; color: #38a169;">
-                                                {{ __('Completed at:') }}
-                                                {{ \Carbon\Carbon::parse($review->done_at)->format('d/m/Y') }}
-                                            </p>
-                                        @else
-                                            <p style="margin-top: 8px; font-family: 'Clear Sans', sans-serif; color: #e53e3e;">
-                                                {{ __('Not completed yet') }}
-                                            </p>
-                                        @endif
-                                    </li>
-                                @endforeach
-                            @else
-                                <p style="font-family: 'Clear Sans', sans-serif; color: #312c27;">
-                                    {{ __('This user has no exercises') }}
-                                </p>
-                                <a href="{{ route('exercise.assign', $data['client']->id) }}"
-                                    style="background-color: #3b82f6; color: white; font-family: 'Clear Sans', sans-serif; font-weight: bold; padding: 12px 20px; border-radius: 8px; text-decoration: none; margin-top: 12px; display: inline-block;">
-                                    {{ __('Assign Exercise') }}
-                                </a>
-                            @endif
-                        </ul>
+
+                        @if (!empty($data['exercisesByDay']))
+                            @foreach ($data['exercisesByDay'] as $date => $exercises)
+                                <div style="margin-top: 20px;">
+                                    <h5 style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27;">
+                                        {{ \Carbon\Carbon::parse($date)->format('d/m/Y') }}
+                                    </h5>
+                                    <ul style="padding-left: 0;">
+                                        @foreach ($exercises as $item)
+                                            <li style="margin-bottom: 20px; padding: 16px; background-color: #feb924; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                    <h6 style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center;">
+                                                        {{ $item['exercise']->title }}
+                                                    </h6>
+                                                    <!-- Botão de lixeira com hover -->
+                                                    <form action="{{ route('client.removeExercise', ['client' => $data['client']->id, 'exercise' => $item['exercise']->id]) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" style="background-color: #f87171; color: white; padding: 8px 12px; border-radius: 50%; border: none; cursor: pointer;" title="Apagar exercício deste usuário">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 18px; height: 18px;">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <p style="margin-top: 12px; font-family: 'Clear Sans', sans-serif; color: #312c27;">
+                                                    {!! nl2br(e($item['exercise']->description)) !!}
+                                                </p>
+                                                <p style="margin-top: 8px; font-family: 'Clear Sans', sans-serif; color: #312c27;">
+                                                    <strong>{{ __('Expiration:') }}</strong>
+                                                    {{ \Carbon\Carbon::parse($item['review']->expiration_date)->format('d/m/Y') }}
+                                                </p>
+                                                @if ($item['review']->done)
+                                                    <p style="margin-top: 8px; font-family: 'Clear Sans', sans-serif; color: #38a169;">
+                                                        {{ __('Completed at:') }}
+                                                        {{ \Carbon\Carbon::parse($item['review']->done_at)->format('d/m/Y') }}
+                                                    </p>
+                                                @else
+                                                    <p style="margin-top: 8px; font-family: 'Clear Sans', sans-serif; color: #e53e3e;">
+                                                        {{ __('Not completed yet') }}
+                                                    </p>
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endforeach
+                        @else
+                            <p style="font-family: 'Clear Sans', sans-serif; color: #312c27;">
+                                {{ __('This user has no exercises') }}
+                            </p>
+                            <a href="{{ route('exercise.assign', $data['client']->id) }}"
+                                style="background-color: #3b82f6; color: white; font-family: 'Clear Sans', sans-serif; font-weight: bold; padding: 12px 20px; border-radius: 8px; text-decoration: none; margin-top: 12px; display: inline-block;">
+                                {{ __('Assign Exercise') }}
+                            </a>
+                        @endif
                     </div>
                 </div>
 
                 <!-- Botões Editar e Deletar posicionados no final -->
-                <div style="margin-top: 40px; text-align: center;">
+                <div style="margin-top: 40px; text-align: center; display: flex; justify-content: center; gap: 12px;">
                     <a href="{{ route('client.edit', $data['client']->id) }}"
-                        style="background-color: #feb924; color: white; font-family: 'Clear Sans', sans-serif; font-weight: bold; padding: 12px 16px; border-radius: 8px; text-decoration: none; margin-right: 8px;">
+                        style="background-color: #feb924; color: white; font-family: 'Clear Sans', sans-serif; font-weight: bold; padding: 12px 16px; border-radius: 8px; text-decoration: none;">
                         {{ __('Edit Client') }}
                     </a>
                     <form action="{{ route('client.destroy', $data['client']->id) }}" method="POST" style="display: inline-block;">

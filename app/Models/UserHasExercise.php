@@ -21,7 +21,7 @@ class UserHasExercise extends Model
         'user_id',
         'review',
         'done',
-        'done_at',
+        'expiration_date',
         'do_again_every'
     ];
 }

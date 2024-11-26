@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Models\Exercise;
 use App\Models\UserHasExercise;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -20,17 +21,16 @@ class HomeController extends Controller
 
         if ($user->access_level == 'trainer') {
             $exercises = $user->trainerExercises;
+            return view('exercises', compact('exercises'));
         } else {
-            $exercises = $user->exercises;
+            $userExercises = $user->exercises;
         }
-        foreach ($exercises as $exercise) {
-            $userExercises = UserHasExercise::where('exercise_id', '=', $exercise->id)->get();
-            foreach ($userExercises as $userExercise) {
-                if ($userExercise->done && isset($userExercise->do_again_every)) {
-                    $doneAt = Carbon::parse($userExercise->done_at);
-                    $nextDueDate = $doneAt->copy()->addDays($userExercise->do_again_every);
-                    $exercise->next_due_date = $nextDueDate->format('d/m/Y');
-                }
+        foreach ($userExercises as $key => $userExercise) {
+            $exercises[$key] = Exercise::find($userExercise->exercise_id);
+            if ($userExercise->done && isset($userExercise->do_again_every)) {
+                $doneAt = Carbon::parse($userExercise->done_at);
+                $nextDueDate = $doneAt->copy()->addDays($userExercise->do_again_every);
+                $exercises[$key]->next_due_date = $nextDueDate->format('d/m/Y');
             }
         }
         return view('exercises', compact('exercises'));

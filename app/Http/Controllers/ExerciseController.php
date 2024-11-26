@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Exercise;
 use App\Http\Controllers\Controller;
+use App\Models\TrainerHasUser;
 use App\Models\User;
 use App\Models\UserHasExercise;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,14 +38,24 @@ class ExerciseController extends Controller
         $request->validate([
             'trainer_id' => 'required|exists:users,id',
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'days' => 'required|array|min:1', // Verifica se há pelo menos um dia selecionado
+            'days.*' => 'required|string', // Cada dia deve ser uma string válida
+            'descriptions' => 'required|array|min:1', // Verifica se há descrições associadas
+            'descriptions.*' => 'required|string', // Cada descrição deve ser uma string válida
         ]);
+
+        // Combinar os dias e as descrições
+        $formattedDescription = "";
+        foreach ($request->days as $index => $day) {
+            $description = $request->descriptions[$index] ?? '';
+            $formattedDescription .= "$day\n\"$description\"\n";
+        }
 
         // Create a new exercise
         $exercise = new Exercise();
         $exercise->trainer_id = $request->trainer_id;
         $exercise->title = $request->title;
-        $exercise->description = $request->description;
+        $exercise->description = trim($formattedDescription); // Remove espaços extras
 
         // Save the exercise to the database
         $exercise->save();
@@ -58,28 +70,76 @@ class ExerciseController extends Controller
     public function assign($id)
     {
         $trainerId = Auth::user()->id;
-        $user = User::findOrFail($id);
-        $exercises = Exercise::where('trainer_id', '=', $trainerId)->get();
+        $usersByTrainer = TrainerHasUser::where("trainer_id", "=", $trainerId)->get();
+        foreach ($usersByTrainer as $key => $value) {
+            $users[$key] = User::find($value['user_id']);
+        }
+        $exercises = Exercise::where('id', '=', $id)->get();
 
-        return view('exercises.assign', compact(['user', 'exercises']));
+        return view('exercises.assign', compact(['users', 'exercises']));
     }
 
     /**
      * Assign selected exercises to a user
      */
-    public function assignToUser(Request $request, $userId)
+    public function assignToUser(Request $request)
     {
-        $user = User::findOrFail($userId);
-        $exerciseIds = $request->input('exercises', []);
+        // Recuperar o ID do usuário e os IDs dos exercícios do request
+        $user = User::findOrFail($request['user_id']);
 
-        foreach ($exerciseIds as $exerciseId) {
+        // Buscar o exercício no banco
+        $exercise = Exercise::findOrFail($request['exercise_id']);
+
+        $expirationDate = Carbon::parse($request['expiration_date'])->startOfDay();
+
+        // Verificar se a descrição do exercício no banco é a mesma que a descrição no request
+        if ($exercise->description === $request->input('description')) {
+            // $saveUserHasExercise = new UserHasExercise();
+            // $saveUserHasExercise->exercise_id = $exercise->id;
+            // $saveUserHasExercise->user_id = $user->id;
+            // $saveUserHasExercise->expiration_date = $request['expiration_date'];
+
+            // $saveUserHasExercise->save();
+
             UserHasExercise::create([
                 'user_id' => $user->id,
-                'exercise_id' => $exerciseId,
-                'done' => false,
+                'exercise_id' => $exercise->id,
+                'expiration_date' => $expirationDate,
             ]);
+        } else {
+
+            $saveExercise = Exercise::create([
+                'trainer_id' => Auth::user()->id,
+                'title' => $exercise->title,
+                'description' => $request['description'],
+            ]);
+
+            UserHasExercise::create([
+                'user_id' => $user->id,
+                'exercise_id' => $saveExercise->id,
+                'expiration_date' => $expirationDate,
+            ]);
+            // $saveExercise = new Exercise();
+            // $saveExercise = Auth::user()->id;
+            // $saveExercise = $exercise->title;
+            // $saveExercise = $exercise->description;
+            // $saveExercise->save();
+
+            // $saveUserHasExercise = new UserHasExercise();
+            // $saveUserHasExercise->exercise_id = $saveExercise->id;
+            // $saveUserHasExercise->user_id = $user->id;
+            // $saveUserHasExercise->expiration_date = $request['expiration_date'];
+            // $saveUserHasExercise->save();
         }
 
+        // // Criar o relacionamento entre o usuário e o exercício
+        // UserHasExercise::create([
+        //     'user_id' => $user->id,
+        //     'exercise_id' => $exerciseId,
+        //     'done' => false,
+        // ]);
+
+        // Retornar a resposta, redirecionando para a página do usuário com uma mensagem de sucesso
         return redirect()->route('client.show', $user->id)->with('success', 'Exercises assigned successfully.');
     }
 
@@ -91,16 +151,39 @@ class ExerciseController extends Controller
     {
         $userId = Auth::user()->id;
 
-        // Tentar encontrar o exercício pelo user_id
-        $exercise = Exercise::find($id);
-        $review = UserHasExercise::where('exercise_id', '=', $id)->where('user_id', '=', $userId)->first();
+        // Tentar encontrar o exercício pelo ID
+        $exercise = Exercise::findOrFail($id);
+
+        // Verificar se o exercício está atribuído ao usuário atual
+        $review = UserHasExercise::where('exercise_id', '=', $id)
+            ->where('user_id', '=', $userId)
+            ->first();
+
+        // Processar a descrição do exercício para separar dias e descrições
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $descriptionByDays = [];
+        if ($exercise->description) {
+            // Normaliza as quebras de linha para o formato Unix
+            $description = preg_replace("/\r\n|\r|\n/", "\n", $exercise->description);
+
+            // Regex para capturar blocos de dias e descrições
+            $pattern = "/(?<day>" . implode('|', $days) . ")\s*\n(.+?)(?=\s*\n(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|$))/s";
+            if (preg_match_all($pattern, $description, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $day = $match['day'];
+                    $content = trim($match[2]); // Descrição do dia
+                    $descriptionByDays[$day] = $content;
+                }
+            }
+        }
 
         $exerciseDetails = [
             'exercise' => $exercise,
-            'review' => $review
+            'review' => $review,
+            'descriptionByDays' => $descriptionByDays,
         ];
 
-        return view('exercises.show', compact(['exerciseDetails']));
+        return view('exercises.show', compact('exerciseDetails'));
     }
 
     /**
