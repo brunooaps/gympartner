@@ -53,7 +53,7 @@
                 @else
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px;">
                         @foreach ($data['clients'] as $key => $client)
-                            <a href="{{ route('client.show', $client->id) }}" style="text-decoration: none; display: block;">
+                            <a href="{{ route('exercise.show', $data['exercise']->id) }}" style="text-decoration: none; display: block;">
                                 <div style="background-color: #feb924; border: 2px solid #312c27; border-radius: 8px; padding: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); min-height: 250px; display: flex; flex-direction: column; justify-content: space-between;">
                                     <h5 style="font-family: 'Hammersmith One', sans-serif; font-size: 1.25rem; color: #312c27; text-align: center;">
                                         {{ $client->name }}

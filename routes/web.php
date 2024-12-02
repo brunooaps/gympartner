@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/exercise/{id}', [ExerciseController::class, 'show'])->name('exercise.show');
     Route::post('/exercise/{id}/done', [ExerciseController::class, 'markAsDone'])->name('exercise.markAsDone');
     Route::post('/exercise/{id}/add-description', [ExerciseController::class, 'addDescription'])->name('exercise.addDescription');
+    Route::post('/chat/store', [ExerciseController::class, 'storeChat'])->name('chat.store');
     Route::get('/exercise/{id}/assign', [ExerciseController::class, 'assign'])->name('exercise.assign');
 });
 

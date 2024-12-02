@@ -38,99 +38,53 @@
                 </div>
             </div>
 
-            <!-- Status do Exercício -->
-            <div
-                style="margin-top: 24px; background-color: #e8e2dd; padding: 16px; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-                @php
-                    // Parse a data de expiração e o dia de hoje, considerando apenas as datas (sem hora)
-                    $expirationDate = \Carbon\Carbon::parse($exerciseDetails['review']->expiration_date)->startOfDay();
-                    $today = \Carbon\Carbon::today()->startOfDay();
-
-                    // Calcular a diferença em dias
-                    $daysLeft = $today->diffInDays($expirationDate, false); // false para permitir valores negativos
-                @endphp
-
-                @if ($daysLeft > 0)
-                    <p style="font-family: 'Clear Sans', sans-serif; color: #228B22; text-align: center;">
-                        {{ __('This exercise will expire in') }} {{ $daysLeft }} {{ __('days.') }} 🏋️‍♂️
-                    </p>
-                @elseif ($daysLeft === 0)
-                    <p style="font-family: 'Clear Sans', sans-serif; color: #228B22; text-align: center;">
-                        {{ __('This exercise expires today!') }} 🏋️‍♀️
-                    </p>
-                @else
-                    <p style="font-family: 'Clear Sans', sans-serif; color: #FF0000; text-align: center;">
-                        {{ __('This exercise has expired!') }} ❌
-                    </p>
-                @endif
-            </div>
-
-
-            <!-- Avaliação -->
+            <!-- Chat -->
             <div
                 style="margin-top: 24px; background-color: #fff; border: 2px solid #feb924; border-radius: 8px; padding: 16px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                @php
+                    // Verifica se o usuário logado é o treinador ou o cliente
+                    $isTrainer = $exerciseDetails['exercise']->trainer_id == auth()->id();
+                @endphp
+
                 <h4
                     style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center;">
-                    {{ __('Review your training') }}
+                    {{ $isTrainer ? __('Chat with your Client') : __('Chat with your Trainer') }}
                 </h4>
-                <p style="margin-top: 16px; font-family: 'Clear Sans', sans-serif; color: #312c27; text-align: center;">
-                    {!! nl2br(e($exerciseDetails['review']->review ?? __('No reviews available.'))) !!}
-                </p>
-                <div style="margin-top: 16px; text-align: center;">
-                    <button onclick="openModal()"
-                        style="background-color: #312c27; color: #feb924; font-family: 'Hammersmith One', sans-serif; padding: 12px 24px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-                        {{ __('Edit Review') }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+                <div id="chatBox" style="max-height: 300px; overflow-y: auto; margin-top: 16px;">
+                    @foreach ($exerciseDetails['chats'] as $chat)
+                        @php
+                            // Verifica se o usuário autenticado é o treinador ou o cliente
+                            $isCurrentUser = $chat->user_id == auth()->id() || $chat->trainer_id == auth()->id();
+                        @endphp
 
-    <!-- Modal -->
-    <div id="editReviewModal" class="hidden fixed z-10 inset-0 overflow-y-auto"
-        style="background-color: rgba(0, 0, 0, 0.5);">
-        <div class="flex items-center justify-center min-h-screen px-4 py-6 sm:px-0">
-            <div
-                style="background-color: #fff; border: 2px solid #feb924; border-radius: 8px; padding: 16px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); width: 100%; max-width: 500px;">
-                <!-- Título com botão de fechar -->
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3
-                        style="font-size: 1.5rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center; margin: 0;">
-                        {{ __('Edit Review') }}
-                    </h3>
-                    <!-- Botão para fechar o modal -->
-                    <button onclick="closeModal()"
-                        style="background-color: transparent; color: #312c27; font-size: 1.5rem; font-weight: bold; border: none; cursor: pointer; padding: 0;">
-                        &times; <!-- Ícone "X" -->
-                    </button>
+                        <div style="display: flex; justify-content: {{ $isCurrentUser ? 'flex-end' : 'flex-start' }};">
+                            <div
+                                style="background-color: {{ $isCurrentUser ? '#feb924' : '#e8e2dd' }}; padding: 8px 16px; border-radius: 8px; margin-bottom: 8px; max-width: 60%; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                                <p style="font-family: 'Clear Sans', sans-serif; color: #312c27; margin: 0;">
+                                    {{ $chat->commentary }}
+                                </p>
+                                <div style="font-size: 0.75rem; color: #6b6b6b; margin-top: 4px; text-align: right;">
+                                    {{ $chat->user_id == auth()->id() ? 'You' : $chat->user->name ?? 'Trainer' }} -
+                                    {{ \Carbon\Carbon::parse($chat->created_at)->format('H:i') }}
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-                <form method="POST" action="{{ route('exercise.addDescription', $exerciseDetails['exercise']->id) }}"
-                    style="margin-top: 16px;">
+
+                <form method="POST" action="{{ route('chat.store') }}" style="margin-top: 16px;">
                     @csrf
-                    <textarea name="client_description" rows="4"
-                        style="width: 100%; padding: 8px; border: 2px solid #feb924; border-radius: 8px; font-family: 'Clear Sans', sans-serif; color: #312c27; resize: none;">{{ old('client_description', $exerciseDetails['review']->review ?? '') }}</textarea>
-                    <div class="flex justify-end" style="margin-top: 16px;">
+                    <input type="hidden" name="exercise_id" value="{{ $exerciseDetails['exercise']->id }}">
+                    <div style="display: flex; gap: 8px;">
+                        <textarea name="commentary" rows="2"
+                            style="flex: 1; padding: 8px; border: 2px solid #feb924; border-radius: 8px; font-family: 'Clear Sans', sans-serif; color: #312c27; resize: none;"></textarea>
                         <button type="submit"
                             style="background-color: #312c27; color: #feb924; font-family: 'Hammersmith One', sans-serif; padding: 8px 16px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-                            {{ __('Save') }}
+                            {{ __('Send') }}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
-
-    <script>
-        // Função para abrir o modal
-        function openModal() {
-            document.getElementById('editReviewModal').classList.remove('hidden');
-        }
-
-        // Função para fechar o modal
-        function closeModal() {
-            document.getElementById('editReviewModal').classList.add('hidden');
-        }
-    </script>
-
 </x-app-layout>

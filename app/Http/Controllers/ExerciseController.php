@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Exercise;
 use App\Http\Controllers\Controller;
+use App\Models\Chat;
 use App\Models\TrainerHasUser;
 use App\Models\User;
 use App\Models\UserHasExercise;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ExerciseController extends Controller
 {
@@ -149,15 +151,18 @@ class ExerciseController extends Controller
      */
     public function show($id)
     {
+        // Recupera o ID do usuário autenticado
         $userId = Auth::user()->id;
 
         // Tentar encontrar o exercício pelo ID
         $exercise = Exercise::findOrFail($id);
 
-        // Verificar se o exercício está atribuído ao usuário atual
-        $review = UserHasExercise::where('exercise_id', '=', $id)
-            ->where('user_id', '=', $userId)
-            ->first();
+        // Recuperar os chats relacionados ao exercício, incluindo o nome do usuário associado
+        $chats = Chat::where('exercise_id', $id)
+            ->with('user') // Certifique-se que a relação está configurada na Model
+            ->orderBy('created_at', 'asc')
+            ->get();
+
 
         // Processar a descrição do exercício para separar dias e descrições
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -177,14 +182,16 @@ class ExerciseController extends Controller
             }
         }
 
+        // Montar os detalhes do exercício
         $exerciseDetails = [
             'exercise' => $exercise,
-            'review' => $review,
+            'chats' => $chats,
             'descriptionByDays' => $descriptionByDays,
         ];
 
         return view('exercises.show', compact('exerciseDetails'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -237,5 +244,38 @@ class ExerciseController extends Controller
         $exercise->save();
 
         return redirect()->route('exercise.show', $id)->with('status', 'Description added successfully!');
+    }
+
+    public function storeChat(Request $request)
+    {
+        // Validar os dados recebidos
+        $request->validate([
+            'exercise_id' => 'required|exists:exercises,id',
+            'commentary' => 'required|string|max:1000',
+        ]);
+
+        // Obter o usuário atual
+        $user = Auth::user();
+
+        // Determinar os dados do chat com base no nível de acesso
+        $chatData = [
+            'exercise_id' => $request->exercise_id,
+            'commentary' => $request->commentary, // Corrigido para usar o nome correto do campo
+        ];
+        if ($user->access_level === 'trainer') {
+            $chatData['trainer_id'] = $user->id;
+        } elseif ($user->access_level === 'client') {
+            $chatData['user_id'] = $user->id;
+        } else {
+            return back()->withErrors(['access_level' => 'Invalid access level']);
+        }
+
+        Log::info($chatData);
+
+        // Criar o registro diretamente
+        Chat::create($chatData);
+
+        // Retornar à mesma página
+        return back()->with('success', 'Comment successfully added');
     }
 }
