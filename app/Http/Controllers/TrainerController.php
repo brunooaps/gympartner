@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
+use App\Models\ExerciseDay;
 use App\Models\TrainerHasUser;
 use App\Models\UserHasExercise;
 use Carbon\Carbon;
@@ -101,26 +102,37 @@ class TrainerController extends Controller
         return view('clients.show', compact('data'));
     }
 
-
     public function showTrainer($id)
     {
+        // Buscar o exercício
         $exercise = Exercise::findOrFail($id);
 
-        // Organizar descrição por dia da semana
-        $descriptionByDays = $this->organizeDescriptionByDays($exercise->description);
+        // Buscar os dias e dados relacionados ao exercício
+        $exerciseDays = ExerciseDay::where('exercise_id', $id)->get();
+
+        // Definir os dias da semana
+        $daysOfWeek = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+
+        // Organizar os dados por dia da semana
+        $descriptionByDays = array_fill_keys($daysOfWeek, []);
+        foreach ($exerciseDays as $day) {
+            $descriptionByDays[$day->dia][] = [
+                'nome' => $day->nome,
+                'series' => $day->series,
+                'repeticoes' => $day->repeticoes,
+                'peso' => $day->peso,
+            ];
+        }
 
         // Obter os usuários vinculados ao exercício
         $usersExercise = UserHasExercise::where('exercise_id', '=', $id)->get();
 
         $clients = [];
-        $reviews = [];
-
         if (!$usersExercise->isEmpty()) {
             foreach ($usersExercise as $value) {
                 $client = User::find($value->user_id);
                 if ($client) {
                     $clients[] = $client;
-                    $reviews[] = $value; // Já possui os dados necessários
                 }
             }
         }
@@ -129,7 +141,6 @@ class TrainerController extends Controller
             'clients' => $clients ?: null,
             'exercise' => $exercise,
             'descriptionByDays' => $descriptionByDays,
-            'reviews' => $reviews ?: null,
         ];
 
         return view('exercises.show-trainer', compact('data'));
@@ -143,14 +154,14 @@ class TrainerController extends Controller
      */
     private function organizeDescriptionByDays($description)
     {
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         $organized = [];
 
         // Normaliza as quebras de linha para o formato Unix
         $description = preg_replace("/\r\n|\r|\n/", "\n", $description);
         // Monta a regex para capturar os blocos entre os dias
         // Usamos \s*\n? para garantir que podemos pegar o final da string (sem exigir uma nova linha após o último dia)
-        $pattern = "/(?<day>" . implode('|', $days) . ")\s*\n(.+?)(?=\s*\n(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|$))/s";
+        $pattern = "/(?<day>" . implode('|', $days) . ")\s*\n(.+?)(?=\s*\n(?:Segunda|Terça|Quarta|Quinta|Sexta|Sábado|Domingo|$))/s";
 
         if (preg_match_all($pattern, $description, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {

@@ -32,7 +32,7 @@
                         </div>
                     @empty
                         <p style="font-family: 'Clear Sans', sans-serif; color: #312c27; text-align: center;">
-                            {{ __('No exercises assigned for this week.') }}
+                            {{ __('Nenhum exercício designado para esta semana.') }}
                         </p>
                     @endforelse
                 </div>
@@ -48,7 +48,7 @@
 
                 <h4
                     style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center;">
-                    {{ $isTrainer ? __('Chat with your Client') : __('Chat with your Trainer') }}
+                    {{ $isTrainer ? __('Converse com seu cliente') : __('Converse com seu treinador') }}
                 </h4>
                 <div id="chatBox" style="max-height: 300px; overflow-y: auto; margin-top: 16px;">
                     @foreach ($exerciseDetails['chats'] as $chat)
@@ -64,7 +64,7 @@
                                     {{ $chat->commentary }}
                                 </p>
                                 <div style="font-size: 0.75rem; color: #6b6b6b; margin-top: 4px; text-align: right;">
-                                    {{ $chat->user_id == auth()->id() ? 'You' : $chat->user->name ?? 'Trainer' }} -
+                                    {{ $chat->user_id == auth()->id() ? 'Você' : $chat->user->name ?? 'Treinador'}} -
                                     {{ \Carbon\Carbon::parse($chat->created_at)->format('H:i') }}
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                             style="flex: 1; padding: 8px; border: 2px solid #feb924; border-radius: 8px; font-family: 'Clear Sans', sans-serif; color: #312c27; resize: none;"></textarea>
                         <button type="submit"
                             style="background-color: #312c27; color: #feb924; font-family: 'Hammersmith One', sans-serif; padding: 8px 16px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-                            {{ __('Send') }}
+                            {{ __('Enviar') }}
                         </button>
                     </div>
                 </form>

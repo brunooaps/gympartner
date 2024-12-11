@@ -20,4 +20,24 @@ class Exercise extends Model
         'title',
         'description',
     ];
+
+    /**
+     * Definir a relação com a tabela exercise_days.
+     * Um exercício pode ter vários ExerciseDays.
+     */
+    public function exerciseDays()
+    {
+        return $this->hasMany(ExerciseDay::class);
+    }
+
+    /**
+     * Apagar os exercise_days quando o exercício for deletado.
+     */
+    protected static function booted()
+    {
+        static::deleting(function ($exercise) {
+            // Apagar os registros associados de exercise_days
+            $exercise->exerciseDays()->delete();
+        });
+    }
 }

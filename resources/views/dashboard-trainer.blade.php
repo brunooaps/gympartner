@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div style="background-color: #e8e2dd; padding: 16px; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
             <h1 class="text-4xl font-bold text-center" style="color: #312c27; font-family: 'Hammersmith One', sans-serif; margin: 0;">
-                {{ __('Your Clients') }}
+                {{ __('Seus clientes') }}
             </h1>
         </div>
     </x-slot>
@@ -13,13 +13,13 @@
                 <div class="flex justify-between items-center mb-4">
                     <a href="{{ route('client.create') }}"
                         style="background-color: #feb924; color: white; font-family: 'Clear Sans', sans-serif; font-weight: bold; padding: 12px 20px; border-radius: 8px; text-decoration: none;">
-                        {{ __('Create Client') }}
+                        {{ __('Criar cliente') }}
                     </a>
                 </div>
 
                 @if($clients->isEmpty())
                     <p class="mt-2" style="font-family: 'Clear Sans', sans-serif; color: #312c27;">
-                        {{ __('You have no clients.') }}
+                        {{ __('Você não tem clientes.') }}
                     </p>
                 @else
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
@@ -33,7 +33,7 @@
                                     {{ $client->email }}
                                 </p>
                                 <p style="font-family: 'Clear Sans', sans-serif; font-size: 1rem; color: #312c27; text-align: center; margin-top: 12px;">
-                                    <strong>{{ __('Joined at:') }}</strong> {{ $client->created_at->format('d/m/Y') }}
+                                    <strong>{{ __('Entrou em:') }}</strong> {{ $client->created_at->format('d/m/Y') }}
                                 </p>
                             </a>
                         @endforeach

@@ -1,38 +1,60 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Create Client') }}
+        <h2 class="font-semibold text-xl text-feb924 dark:text-312c27 leading-tight">
+            {{ __('Criar um Cliente') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-feb924 dark:bg-312c27 shadow rounded-lg">
+                <div class="p-6">
                     <form method="POST" action="{{ route('client.store') }}" class="space-y-6">
                         @csrf
 
-                        <!-- Name -->
+                        <!-- Nome -->
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Name') }}</label>
-                            <input id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" type="text" name="name" value="{{ old('name') }}" required autofocus />
+                            <label for="name" class="block text-sm font-medium text-312c27 dark:text-feb924">
+                                {{ __('Nome') }}
+                            </label>
+                            <input 
+                                id="name" 
+                                type="text" 
+                                name="name" 
+                                value="{{ old('name') }}" 
+                                required 
+                                autofocus
+                                class="mt-1 block w-full rounded-md border-312c27 shadow-sm dark:border-feb924 dark:bg-312c27 dark:text-feb924 focus:border-feb924 focus:ring focus:ring-feb924 sm:text-sm"
+                            />
                         </div>
 
                         <!-- Email -->
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Email') }}</label>
-                            <input id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" type="email" name="email" value="{{ old('email') }}" required />
+                            <label for="email" class="block text-sm font-medium text-312c27 dark:text-feb924">
+                                {{ __('Email') }}
+                            </label>
+                            <input 
+                                id="email" 
+                                type="email" 
+                                name="email" 
+                                value="{{ old('email') }}" 
+                                required 
+                                class="mt-1 block w-full rounded-md border-312c27 shadow-sm dark:border-feb924 dark:bg-312c27 dark:text-feb924 focus:border-feb924 focus:ring focus:ring-feb924 sm:text-sm"
+                            />
                         </div>
 
-                        <!-- Hidden Access Level -->
+                        <!-- Nível de Acesso (Oculto) -->
                         <input type="hidden" name="access_level" value="client">
 
-                        <!-- Password (Hidden, using email as password) -->
-                        <input type="hidden" name="password" value="{{ old('email') }}" />
+                        <!-- Senha (Oculto) -->
+                        <input type="hidden" name="password" value="{{ old('email') }}">
 
                         <div class="flex items-center justify-end">
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:border-blue-700 focus:ring focus:ring-blue-200 active:bg-blue-600 disabled:opacity-25 transition">
-                                {{ __('Create Client') }}
+                            <button 
+                                type="submit" 
+                                class="inline-flex items-center px-4 py-2 bg-312c27 text-feb924 font-medium text-sm leading-5 rounded-md shadow-sm hover:bg-feb924 hover:text-312c27 focus:outline-none focus:ring focus:ring-feb924 focus:ring-opacity-50 transition"
+                            >
+                                {{ __('Criar Cliente') }}
                             </button>
                         </div>
                     </form>

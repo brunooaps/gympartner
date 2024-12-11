@@ -13,13 +13,13 @@
             <div class="hidden sm:flex space-x-6 items-center">
                 <a href="{{ route('exercises') }}" style="font-family: 'Hammersmith One', sans-serif; color: #feb924; font-size: 1.2rem; text-decoration: none; padding: 8px 12px; border-radius: 8px; transition: background-color 0.2s;"
                     :class="{'bg-amber-500': request()->routeIs('exercises')}">
-                    {{ __('Exercises') }}
+                    {{ __('Exercícios') }}
                 </a>
 
                 @if(Auth::user()->access_level == 'trainer')
                     <a href="{{ route('client.index') }}" style="font-family: 'Hammersmith One', sans-serif; color: #feb924; font-size: 1.2rem; text-decoration: none; padding: 8px 12px; border-radius: 8px; transition: background-color 0.2s;"
                         :class="{'bg-amber-500': request()->routeIs('client.index')}">
-                        {{ __('Clients') }}
+                        {{ __('Clientes') }}
                     </a>
                 @endif
             </div>
@@ -38,14 +38,14 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')" style="font-family: 'Clear Sans', sans-serif;">
-                            {{ __('Profile') }}
+                            {{ __('Perfil') }}
                         </x-dropdown-link>
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
                                 onclick="event.preventDefault(); this.closest('form').submit();" style="font-family: 'Clear Sans', sans-serif;">
-                                {{ __('Log Out') }}
+                                {{ __('Sair') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -64,14 +64,14 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div style="background-color: #312c27; color: #feb924; font-family: 'Clear Sans', sans-serif;">
-            <a href="{{ route('exercises') }}" class="block px-4 py-2">{{ __('Exercises') }}</a>
+            <a href="{{ route('exercises') }}" class="block px-4 py-2">{{ __('Exercícios') }}</a>
             @if(Auth::user()->access_level == 'trainer')
-                <a href="{{ route('client.index') }}" class="block px-4 py-2">{{ __('Clients') }}</a>
+                <a href="{{ route('client.index') }}" class="block px-4 py-2">{{ __('Clientes') }}</a>
             @endif
-            <a href="{{ route('profile.edit') }}" class="block px-4 py-2">{{ __('Profile') }}</a>
+            <a href="{{ route('profile.edit') }}" class="block px-4 py-2">{{ __('Perfil') }}</a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="block w-full text-left px-4 py-2">{{ __('Log Out') }}</button>
+                <button type="submit" class="block w-full text-left px-4 py-2">{{ __('Sair') }}</button>
             </form>
         </div>
     </div>

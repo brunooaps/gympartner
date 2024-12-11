@@ -2,19 +2,19 @@
     <div class="py-12" style="background-color: #e8e2dd;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h3 class="font-hammersmith text-2xl text-312c27 mb-6">
-                {{ __('Your Exercises') }}
+                {{ __('Seus exercício') }}
             </h3>
 
             @if(Auth::user()->access_level == 'trainer')
                 <a href="{{ route('exercise.create') }}" 
                    style="background-color: #feb924; color: #312c27; padding: 10px 20px; font-family: 'Clear Sans', sans-serif; border-radius: 8px; text-decoration: none; font-weight: bold;">
-                    {{ __('Create Exercise') }}
+                    {{ __('Criar exercícios') }}
                 </a>
             @endif
 
             @if(!isset($exercises))
                 <p class="mt-6 font-clear-sans text-lg text-312c27">
-                    {{ __('You have no exercises.') }}
+                    {{ __('Você não tem exercícios') }}
                 </p>
             @else
                 <!-- Ajuste na estrutura da grade -->
@@ -36,12 +36,12 @@
                             </p>
                             @if($exercise->next_due_date && Auth::user()->access_level != 'trainer')
                                 <p style="font-family: 'Clear Sans', sans-serif; font-size: 0.9rem; color: #312c27; margin-top: 8px;">
-                                    {{ __('Next due date:') }} {{ $exercise->next_due_date }}
+                                    {{ __('Proximo exercício:') }} {{ $exercise->next_due_date }}
                                 </p>
                             @endif
                             @if($exercise->done && Auth::user()->access_level != 'trainer')
                                 <p style="font-family: 'Clear Sans', sans-serif; font-size: 0.9rem; color: green; margin-top: 8px;">
-                                    ✔️ {{ __('Completed') }}
+                                    ✔️ {{ __('Concluido') }}
                                 </p>
                             @endif
                         </a>
