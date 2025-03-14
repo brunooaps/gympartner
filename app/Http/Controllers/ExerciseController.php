@@ -122,7 +122,7 @@ class ExerciseController extends Controller
         ]);
 
         // Retornar a resposta, redirecionando para a página do usuário com uma mensagem de sucesso
-        return redirect()->route('client.show', $user->id)->with('success', 'Exercises assigned successfully.');
+        return redirect()->route('client.show', base64_encode($user->id))->with('success', 'Exercises assigned successfully.');
     }
 
 
