@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div style="background-color: #e8e2dd; padding: 16px; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
             <h1 class="text-4xl font-bold text-center" style="color: #312c27; font-family: 'Hammersmith One', sans-serif; margin: 0;">
-                {{ __('Detalhes do exercício') }}
+                {{ __('Detalhes do Treino') }}
             </h1>
         </div>
     </x-slot>
@@ -41,7 +41,7 @@
             <!-- Lista de Clientes -->
             <div style="margin-top: 24px; background-color: #e8e2dd; padding: 16px; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
                 <h4 style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center;">
-                    {{ __('Clientes com esse exercício:') }}
+                    {{ __('Clientes com esse Treino:') }}
                 </h4>
 
                 @if (empty($data['clients']))

@@ -2,19 +2,19 @@
     <div class="py-12" style="background-color: #e8e2dd;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h3 class="font-hammersmith text-2xl text-312c27 mb-6">
-                {{ __('Seus exercício') }}
+                {{ __('Seus Treinos') }}
             </h3>
 
             @if(Auth::user()->access_level == 'trainer')
                 <a href="{{ route('exercise.create') }}" 
                    style="background-color: #feb924; color: #312c27; padding: 10px 20px; font-family: 'Clear Sans', sans-serif; border-radius: 8px; text-decoration: none; font-weight: bold;">
-                    {{ __('Criar exercícios') }}
+                    {{ __('Criar Treino') }}
                 </a>
             @endif
 
             @if(!isset($exercises))
                 <p class="mt-6 font-clear-sans text-lg text-312c27">
-                    {{ __('Você não tem exercícios') }}
+                    {{ __('Você não tem Treinos') }}
                 </p>
             @else
                 <!-- Ajuste na estrutura da grade -->
@@ -22,8 +22,8 @@
                     @foreach($exercises as $exercise)
                         @php
                             $route = Auth::user()->access_level == 'trainer' 
-                                ? route('exercise.show-trainer', $exercise->id) 
-                                : route('exercise.show', $exercise->id);
+                                ? route('exercise.show-trainer', $exercise->hash_id) 
+                                : route('exercise.show', $exercise->hash_id);
                         @endphp
 
                         <!-- Card de exercício -->

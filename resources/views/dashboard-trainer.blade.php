@@ -24,7 +24,7 @@
                 @else
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
                         @foreach($clients as $client)
-                            <a href="{{ route('client.show', $client->id) }}"
+                            <a href="{{ route('client.show', $client->hash_id) }}"
                                 style="display: block; background-color: #fff; border: 2px solid #feb924; border-radius: 8px; padding: 16px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-decoration: none;">
                                 <h4 style="font-size: 1.25rem; font-family: 'Hammersmith One', sans-serif; color: #312c27; text-align: center;">
                                     {{ $client->name }}

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Exercise;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
+use App\Models\ExerciseDay;
 use App\Models\TrainerHasUser;
 use App\Models\User;
 use App\Models\UserHasExercise;
@@ -37,6 +38,7 @@ class ExerciseController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request);
         // Validar os dados de entrada
         $request->validate([
             'trainer_id' => 'required|exists:users,id',
@@ -91,8 +93,7 @@ class ExerciseController extends Controller
             foreach ($usersByTrainer as $key => $value) {
                 $users[$key] = User::find($value['user_id']);
             }
-        }
-        else {
+        } else {
             $users = null;
         }
 
@@ -134,31 +135,38 @@ class ExerciseController extends Controller
         $userId = Auth::user()->id;
 
         // Tentar encontrar o exercício pelo ID
-        $exercise = Exercise::findOrFail($id);
+        $decodedId = base64_decode($id);
+        $exercise = Exercise::findOrFail($decodedId);
 
         // Recuperar os chats relacionados ao exercício, incluindo o nome do usuário associado
-        $chats = Chat::where('exercise_id', $id)
+        $chats = Chat::where('exercise_id', $decodedId)
             ->with('user') // Certifique-se que a relação está configurada na Model
             ->orderBy('created_at', 'asc')
             ->get();
 
+        // Carregar os ExerciseDays associados ao exercício
+        $exerciseDays = ExerciseDay::where('exercise_id', $exercise['id'])->get();
 
         // Processar a descrição do exercício para separar dias e descrições
-        $days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-        $descriptionByDays = [];
-        if ($exercise->description) {
-            // Normaliza as quebras de linha para o formato Unix
-            $description = preg_replace("/\r\n|\r|\n/", "\n", $exercise->description);
+        // $descriptionByDays = [];
+        // foreach ($exerciseDays as $exerciseDay) {
+        //     $descriptionByDays[$exerciseDay->nome] = [
+        //         'dia' => $exerciseDay->dia,
+        //         'series' => $exerciseDay->series,
+        //         'repeticoes' => $exerciseDay->repeticoes,
+        //         'peso' => $exerciseDay->peso,
+        //     ];
+        // }
 
-            // Regex para capturar blocos de dias e descrições
-            $pattern = "/(?<day>" . implode('|', $days) . ")\s*\n(.+?)(?=\s*\n(?:Segunda|Terça|Quarta|Quinta|Sexta|Sábado|Domingo|$))/s";
-            if (preg_match_all($pattern, $description, $matches, PREG_SET_ORDER)) {
-                foreach ($matches as $match) {
-                    $day = $match['day'];
-                    $content = trim($match[2]); // Descrição do dia
-                    $descriptionByDays[$day] = $content;
-                }
-            }
+        $daysOfWeek = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+        $descriptionByDays = array_fill_keys($daysOfWeek, []);
+        foreach ($exerciseDays as $day) {
+            $descriptionByDays[$day->dia][] = [
+                'nome' => $day->nome,
+                'series' => $day->series,
+                'repeticoes' => $day->repeticoes,
+                'peso' => $day->peso,
+            ];
         }
 
         // Montar os detalhes do exercício

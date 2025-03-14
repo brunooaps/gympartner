@@ -21,6 +21,13 @@ class HomeController extends Controller
 
         if ($user->access_level == 'trainer') {
             $exercises = $user->trainerExercises;
+
+            // Gerar um hash para o id de cada cliente
+            $exercises->transform(function ($exercise) {
+                $exercise->hash_id = base64_encode($exercise->id); // Gerando o hash para o id
+                return $exercise;
+            });
+
             return view('exercises', compact('exercises'));
         } else {
             $userExercises = $user->exercises;
@@ -34,11 +41,20 @@ class HomeController extends Controller
                     $exercises[$key]->next_due_date = $nextDueDate->format('d/m/Y');
                 }
             }
+
+            // Convertendo para coleção antes de usar o transform
+            $exercises = collect($exercises);  // Convertendo para uma coleção
+
+            // Adicionando o hash_id para cada exercício
+            $exercises->transform(function ($exercise) {
+                $exercise->hash_id = base64_encode($exercise->id); // Gerando o hash para o id
+                return $exercise;
+            });
+
             return view('exercises', compact('exercises'));
         } else {
             return view('exercises');
         }
-
     }
 
     /**

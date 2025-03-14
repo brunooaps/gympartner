@@ -18,7 +18,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/exercise/{id}', [ExerciseController::class, 'show'])->name('exercise.show');
+    Route::get('/exercise/{hash_id}', [ExerciseController::class, 'show'])->name('exercise.show');
     Route::post('/exercise/{id}/done', [ExerciseController::class, 'markAsDone'])->name('exercise.markAsDone');
     Route::post('/exercise/{id}/add-description', [ExerciseController::class, 'addDescription'])->name('exercise.addDescription');
     Route::post('/chat/store', [ExerciseController::class, 'storeChat'])->name('chat.store');
@@ -28,8 +28,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', CheckAccessLevel::class])->group(function () {
     Route::get('/dashboard-trainer', [TrainerController::class, 'index'])->name('client.index');
     Route::get('/clients', [TrainerController::class, 'create'])->name('client.create');
-    Route::get('/client/{id}', [TrainerController::class, 'show'])->name('client.show');
-    Route::get('/exercise/trainer/{id}', [TrainerController::class, 'showTrainer'])->name('exercise.show-trainer');
+    Route::get('/client/{hash_id}', [TrainerController::class, 'show'])->name('client.show');
+    Route::get('/exercise/trainer/{hash_id}', [TrainerController::class, 'showTrainer'])->name('exercise.show-trainer');
     Route::get('/exercise/assign/{id}', [ExerciseController::class, 'assign'])->name('exercise.assign');
     Route::get('/exercises/create', [ExerciseController::class, 'create'])->name('exercise.create');
     Route::post('/exercise/store', [ExerciseController::class, 'store'])->name('exercise.store');
