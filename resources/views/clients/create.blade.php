@@ -43,6 +43,27 @@
                             />
                         </div>
 
+                        <div>
+                            <label for="birthdate" class="block text-sm font-medium text-312c27 dark:text-feb924">
+                                {{ __('Data de nascimento') }}
+                            </label>
+                            <input 
+                                id="birthdate" 
+                                type="date" 
+                                name="birthdate" 
+                                value="{{ old('birthdate') ? old('birthdate') : '' }}" 
+                                required 
+                                class="mt-1 block w-full rounded-md border-312c27 shadow-sm dark:border-feb924 dark:bg-312c27 dark:text-feb924 focus:border-feb924 focus:ring focus:ring-feb924 sm:text-sm"
+                            />
+                        
+                            <!-- Exibindo para o cliente em dd/mm/yyyy -->
+                            <span class="text-sm text-gray-500">
+                                @if(old('birthdate'))
+                                    {{ \Carbon\Carbon::parse(old('birthdate'))->format('d/m/Y') }}
+                                @endif
+                            </span>
+                        </div>
+
                         <!-- Nível de Acesso (Oculto) -->
                         <input type="hidden" name="access_level" value="client">
 

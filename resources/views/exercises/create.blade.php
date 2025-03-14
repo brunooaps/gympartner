@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="header-container">
             <h1 class="header-title">
-                {{ __('Criar exercício') }}
+                {{ __('Criar Treino') }}
             </h1>
         </div>
     </x-slot>
@@ -10,7 +10,7 @@
     <div class="content-container">
         <div class="form-container">
             <h2 class="form-title">
-                {{ __('Criar novo exercício') }}
+                {{ __('Criar novo Treino') }}
             </h2>
 
             <form method="POST" action="{{ route('exercise.store') }}">
@@ -68,7 +68,7 @@
                 <!-- Submit Button -->
                 <div class="form-actions">
                     <button type="submit" class="submit-button">
-                        {{ __('Criar exercício') }}
+                        {{ __('Criar Treino') }}
                     </button>
                 </div>
             </form>

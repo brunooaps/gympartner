@@ -25,15 +25,20 @@ class HomeController extends Controller
         } else {
             $userExercises = $user->exercises;
         }
-        foreach ($userExercises as $key => $userExercise) {
-            $exercises[$key] = Exercise::find($userExercise->exercise_id);
-            if ($userExercise->done && isset($userExercise->do_again_every)) {
-                $doneAt = Carbon::parse($userExercise->done_at);
-                $nextDueDate = $doneAt->copy()->addDays($userExercise->do_again_every);
-                $exercises[$key]->next_due_date = $nextDueDate->format('d/m/Y');
+        if (count($userExercises) > 0) {
+            foreach ($userExercises as $key => $userExercise) {
+                $exercises[$key] = Exercise::find($userExercise->exercise_id);
+                if ($userExercise->done && isset($userExercise->do_again_every)) {
+                    $doneAt = Carbon::parse($userExercise->done_at);
+                    $nextDueDate = $doneAt->copy()->addDays($userExercise->do_again_every);
+                    $exercises[$key]->next_due_date = $nextDueDate->format('d/m/Y');
+                }
             }
+            return view('exercises', compact('exercises'));
+        } else {
+            return view('exercises');
         }
-        return view('exercises', compact('exercises'));
+
     }
 
     /**
